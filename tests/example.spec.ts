@@ -1,21 +1,38 @@
-import { test, expect } from '@playwright/test';
-import * as LocatorUtils from '../utils/LocatorUtils';
+import { test, expect } from '../fixtures/baseTest';
+import { Logger } from '../utils/Logger';
+import { getTexts } from '../utils/LocatorUtils';
+
+
+Logger.success('Samsung entered successfully');
 
 test('has titles', async ({ page }) => {
 
+  Logger.info('Opening Amazon');
   await page.goto('https://www.amazon.in/');
+
+  Logger.warn('Searching Samsung');
 
   await page.getByPlaceholder('Search Amazon.in').fill('Samsung');
 
-  await page.locator('#nav-search-submit-button').click();
+  //screenshots 
+  await page.screenshot({
+    path: 'screenshots/after-search.png'
+  });
 
-  const phoneNames = await LocatorUtils.getTexts(
+  //Screenshot options  //quality, caret, type, animations
+  await page.screenshot({path : 'screenshots/after-search.png',fullPage : true})
+  
+  const search = page.locator('#nav-search-submit-button');
+  await search.screenshot({path : 'screenshots/at.png'});
+  await search.click();
+
+  const phoneNames = await getTexts(
     page.locator(
       "//h2[@class='a-size-medium a-spacing-none a-color-base a-text-normal']"
     )
   );
 
-    const prices = await LocatorUtils.getTexts(
+    const prices = await getTexts(
     page.locator(
       "//span[@class='a-price' and @data-a-size='xl']//span[@class ='a-price-whole']"
     )
@@ -23,7 +40,8 @@ test('has titles', async ({ page }) => {
 
 
 
-  console.log('Products:', phoneNames);
+  //set logger from sting to unknown for any type of objects
+  Logger.info(phoneNames)
   console.log('Count:', phoneNames.length);
 
   console.log('Prices:', prices);
